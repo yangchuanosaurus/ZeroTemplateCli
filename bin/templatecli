@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
+
+require 'zero_logger'
+#require 'templatecli'
+require_relative '../lib/templatecli'
+
+@logger = ZeroLogger.logger("main")
+
+def usage
+	@logger.begin("Do you want using following commands?")
+	@logger.level = 1
+	@logger.add_msg("init    | templatecli init name version")
+	@logger.add_msg("init    | templatecli init as center")
+	@logger.add_msg("use     | templatecli use name version")
+	@logger.add_msg("install | templatecli install")
+	@logger.add_msg("info    | templatecli info")
+	@logger.add_msg("publish | templatecli publish")
+	@logger.log
+	exit(1)
+end
+
+VERBS = ['init', 'use', 'install', 'publish', 'info']
+
+if VERBS.include? ARGV.first
+  @verb = ARGV.shift
+else
+  @verb = nil
+end
+
+usage unless !@verb.nil?
+
+begin
+	results = ZeroSolution::Command.send(@verb, *ARGV)
+	@logger.log
+rescue Exception => e
+	puts e
+	puts "invalidate args of `#{@verb}`"
+ensure
+
+end

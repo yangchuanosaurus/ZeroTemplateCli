@@ -1,0 +1,4 @@
+---
+:name: template center of local file-system
+:version: 1.0.0
+:local: "path"
