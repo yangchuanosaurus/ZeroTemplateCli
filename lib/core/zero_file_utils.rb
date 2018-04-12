@@ -1,30 +1,30 @@
 require 'yaml'
+require 'fileutils'
 
 module ZeroSolution
-	class FileUtils
+	class ZeroFileUtils
 
 		def self.exists?(file_name)
 			File.exists?(file_name)
 		end
 
 		def self.load_yaml(relative_file_path)
-			YAML.load_file(full_path(relative_file_path))
+			YAML.load_file(relative_file_path)
 		end
 
 		def self.write(file, dash)
-			puts "file  #{file}"
 			mode = "w"
 			File.open(file, mode) do |file|
 				file.puts dash.to_yaml
 			end
 		end
 
-		def self.full_path(path)
-			"#{self.root_path}/#{path}"
+		def self.cp_directory(src, dest)
+			FileUtils.cp_r(src, dest)
 		end
 
-		def self.root_path
-			Dir.pwd
+		def self.list(dir_name)
+			Dir.entries(dir_name)
 		end
 
 	end

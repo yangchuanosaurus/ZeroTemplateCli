@@ -1,0 +1,9 @@
+---
+:uses:
+- template-android-hello: latest
+:vocabulary:
+  :copy:
+    :source: main/src/java
+    :resources: main/src/resources
+  :dependency:
+    gradle: :app

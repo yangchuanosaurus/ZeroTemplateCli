@@ -1,6 +1,6 @@
 require_relative 'template_project'
 require_relative 'template_center'
-require_relative 'template'
+require_relative 'template_use'
 require_relative 'template_install'
 require_relative 'version'
 
@@ -19,18 +19,6 @@ module ZeroSolution
 
 			template_name 		= params[0]
 			template_version  = params[1]
-
-			if template_name.downcase == 'as'
-				if template_version.downcase == 'center'
-					center = TemplateCenter.new
-					center.init
-					return
-				else
-					logger.begin('templatecli init as what?')
-					logger.add_error("arguments of `init` should be `as center`.")
-					return
-				end
-			end
 
 			project = TemplateProject.new(template_name, template_version)
 			project.init
@@ -51,19 +39,15 @@ module ZeroSolution
 			template_name 	 = params[0]
 			template_version = params.size == 2 ? params[1] : 'latest'
 
-			template = Template.new(template_name, template_version)
-			template.use
+			template_use = TemplateUse.new
+			template_use.use(template_name, template_version)
 		end
 
 		def self.publish
 			logger = ZeroLogger.logger("main")
 
 			# check if current path is a template project
-
-			template_name 	 = 'fetch from config'
-			template_version = 'fetch from config'
-			template = Template.new(template_name, template_version)
-			template.publish
+			TemplateProject.publish
 		end
 
 		def self.info
@@ -72,6 +56,29 @@ module ZeroSolution
 			logger.level += 1
 			logger.add_msg("version: #{ZeroSolution.version}")
 			logger.add_msg("update:  #{ZeroSolution.date}")
+
+			if TemplateCenter.is_exists?
+				template_center = TemplateCenter.load
+				if !template_center.nil?
+					logger.add_msg("Template Center")
+					logger.level += 1
+					logger.add_msg("path: #{template_center.center_dir}")
+					logger.level -= 1
+				end
+			else
+				logger.add_msg("Warning: No Template Center defined.")
+			end
+			
+			# check if current folder is root of template project
+			if TemplateProject.is_template_project?
+				template_project = TemplateProject.load_template_project
+				logger.add_msg("Template Project")
+				logger.level += 1
+				logger.add_msg("   name: #{template_project.template_name}")
+				logger.add_msg("version: #{template_project.template_version}")
+				logger.level -= 1
+			end
+			logger.add_msg("end.")
 		end
 
 		def self.install
@@ -82,6 +89,28 @@ module ZeroSolution
 			# check if vocabulary exists
 			installer = Installer.new
 			installer.install
+		end
+
+		def self.center(*params)
+			logger = ZeroLogger.logger("main")
+
+			if params.empty? || params.size < 1
+				logger.begin('templatecli center')
+				logger.add_error("wrong arguments of `center`.")
+				return
+			end
+
+			center_action  = params[0]
+
+			if center_action.downcase == 'scan'
+				TemplateCenter.scan
+			elsif center_action.downcase == 'init'
+				center = TemplateCenter.new
+				center.init
+			else
+				logger.begin('templatecli center what?')
+				logger.add_error("arguments of `center` is invalid.")
+			end
 		end
 
 	end

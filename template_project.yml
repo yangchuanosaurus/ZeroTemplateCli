@@ -1,0 +1,24 @@
+---
+:template_center: path_to_template_center1
+:name: name
+:version_string: 1.0.0
+:version:
+- 1
+- 0
+- 0
+:vocabulary:
+  :copy:
+    :source:
+    - folder1
+    - folder2
+    :resources:
+    - folder1
+    - folder2
+  :dependency:
+    :gradle: 3.0.1
+    :dependencies:
+    - a
+    - b
+:templates:
+  SampleTemplate: 1.0.0
+  OtherTemplate: latest

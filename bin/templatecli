@@ -11,17 +11,18 @@ require_relative '../lib/templatecli'
 def usage
 	@logger.begin("Do you want using following commands?")
 	@logger.level = 1
-	@logger.add_msg("init    | templatecli init name version")
-	@logger.add_msg("init    | templatecli init as center")
-	@logger.add_msg("use     | templatecli use name version")
-	@logger.add_msg("install | templatecli install")
-	@logger.add_msg("info    | templatecli info")
-	@logger.add_msg("publish | templatecli publish")
+	@logger.add_msg("init          | templatecli init name version")
+	@logger.add_msg("use           | templatecli use name version")
+	@logger.add_msg("install       | templatecli install")
+	@logger.add_msg("info          | templatecli info")
+	@logger.add_msg("publish       | templatecli publish")
+	@logger.add_msg("center init   | templatecli init as center")
+	@logger.add_msg("center scan   | templatecli scan center")
 	@logger.log
 	exit(1)
 end
 
-VERBS = ['init', 'use', 'install', 'publish', 'info']
+VERBS = ['init', 'use', 'install', 'publish', 'info', 'center']
 
 if VERBS.include? ARGV.first
   @verb = ARGV.shift
