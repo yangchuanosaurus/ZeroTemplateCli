@@ -55,7 +55,7 @@ module ZeroSolution
 			logger.add_msg("`#{@template_name} - #{template_version}`")
 			# copy current template project to template center
 			src  = Dir.pwd
-			dest = template_center.center_dir
+			dest = template_center.center_dir + "/#{@template_name}/#{template_version}"
 
 			ZeroFileUtils.cp_directory(src, dest)
 

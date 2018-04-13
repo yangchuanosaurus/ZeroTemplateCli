@@ -24,10 +24,10 @@ module ZeroSolution
 			# install the template
 			template_center = TemplateCenter.load
 			@logger.level += 1
-			if template_center.find_template?(template)
-				
-				@logger.add_msg("Found in template center.")
-				
+
+			template_project = template_center.find_template(template)
+			if !template_project.nil?
+				@logger.add_msg("Found template #{template_project.inspect}.")
 			else
 				@logger.add_msg("Not found in template center.")
 			end

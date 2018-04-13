@@ -1,7 +1,6 @@
 ---
 :uses:
-- bname: 1.0.0
-- aname: 1.0.1
+- hello: latest
 :vocabulary:
   :copy:
     :source: main/src/java

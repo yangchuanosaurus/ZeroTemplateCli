@@ -1,6 +1,7 @@
 module ZeroSolution
   VERSION_INFO = [1, 0, 0, 'rc1'].freeze
   VERSION = VERSION_INFO.map(&:to_s).join('.').freeze
+  VERSION_LATEST = 'latest'
 
   LATEST_UPDATE = 'Apr 20, 2018'
 

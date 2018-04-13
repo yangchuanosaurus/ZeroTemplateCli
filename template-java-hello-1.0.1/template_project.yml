@@ -1,11 +1,11 @@
 ---
-:template_center: path_to_template_center1
-:name: name
-:version_string: 1.0.0
+:template_center: path_to_template_center
+:name: hello
+:version_string: 1.0.1
 :version:
 - 1
 - 0
-- 0
+- 1
 :vocabulary:
   :copy:
     :source:

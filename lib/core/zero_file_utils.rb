@@ -20,6 +20,8 @@ module ZeroSolution
 		end
 
 		def self.cp_directory(src, dest)
+			# copy all files in src to dest
+			FileUtils.mkdir_p(File.dirname(dest)) if !exists?(dest)
 			FileUtils.cp_r(src, dest)
 		end
 

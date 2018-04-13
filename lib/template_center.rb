@@ -47,33 +47,83 @@ module ZeroSolution
 
 			# Scan center_dir
 			sub_files = ZeroFileUtils.list(@center_dir)
+
 			if !sub_files.nil? && sub_files.length > 0
 				logger.level += 1
-
-				template_center_dash = template_load_template_center
 				template_array = Array.new
+				template_center_dash = template_load_template_center
+				
 				sub_files.each do |file_name|
-					if file_name != '.' && file_name != '..'
-						template_project = TemplateProject.load_template_project_by_dir(@center_dir + '/' + file_name)
+					template_path = @center_dir + '/' + file_name
+
+					if file_name != '.' && file_name != '..' && Dir.exists?(template_path)
+						# should enter and get the version path
+						version_files = ZeroFileUtils.list(template_path)
 						
-						if !template_project.nil?
-							# Add to center file
-							logger.add_msg("Template `#{template_project.template_name} - #{template_project.template_version}`")
-							template_array << { file_name => { template_project.template_name => template_project.template_version } }
+						version_files.each do |version|
+							if version != '.' && version != '..'
+								template_project = TemplateProject.load_template_project_by_dir(template_path + '/' + version)
 							
+								if !template_project.nil?
+									# Add to center file
+									logger.add_msg("Template `#{template_project.template_name} - #{template_project.template_version}`")
+									template_array << { template_project.template_name => template_project.template_version }
+									
+								end
+							end
 						end
+						
 					end
 				end
 				template_center_dash[:templates] = template_array
 				logger.level -= 1
-				puts TEMPLATE_CENTER_FILE
 				ZeroFileUtils.write(center_dir + '/' + TEMPLATE_CENTER_FILE, template_center_dash)
 				logger.add_msg('Re indexes of templates.')
 			end
 		end
 
-		def find_template?(template)
-			return true
+		def find_template(template)
+			templates_ary_dash = load_center_templates_dash
+
+			if templates_ary_dash.nil? || templates_ary_dash.empty?
+				logger = ZeroLogger.logger("main")
+				scan
+				templates_ary_dash = load_center_templates_dash
+			end
+
+			if templates_ary_dash.nil? || templates_ary_dash.empty?
+				return nil
+			end
+
+			by_version = template.version != VERSION_LATEST
+			# find template by name
+			found_templates_ary_dash = templates_ary_dash.select do |template_path_dash|
+				template_name, template_version = load_template_dash(template_path_dash)
+
+				if by_version
+					template_name == template.name && template_version == template.version
+				else
+					template_name == template.name
+				end
+			end
+
+			if by_version
+				return nil if found_templates_ary_dash.nil? || found_templates_ary_dash.empty?
+				template_name, template_version = load_template_dash(found_templates_ary_dash[0])
+				return load_template(template_name, template_version)
+			end
+
+			# sort the template by version
+			found_templates_ary_dash.sort! do |current_template, next_template|
+				template_name, current_template_version = load_template_dash(current_template)
+				template_name, next_template_version = load_template_dash(next_template)
+				current_template_version_code = version_code(current_template_version)
+				next_template_version_code = version_code(next_template_version)
+				next_template_version_code <=> current_template_version_code
+			end
+
+			template_name, template_version = load_template_dash(found_templates_ary_dash[0])
+			return load_template(template_name, template_version)
 		end
 
 		def self.is_exists?
@@ -111,6 +161,30 @@ module ZeroSolution
 			template_center_dash[:local] = Dir.pwd
 
 			template_center_dash
+		end
+
+		def load_template_dash(template_path_dash)
+			template_name = template_path_dash.keys[0]
+			template_version = template_path_dash[template_name]
+			return template_name, template_version
+		end
+
+		def version_code(template_version)
+			# 1.0.1 => 1.01, 1.0.1.1  => 1.011
+			first_dot_pos = template_version.index('.')
+			version_code = template_version.gsub(/\./, '')
+			version_code.insert(first_dot_pos, '.')
+			version_code.to_f
+		end
+
+		def load_template(template_name, template_version)
+			dir = @center_dir + '/' + template_name + '/' + template_version
+			TemplateProject.load_template_project_by_dir(dir)
+		end
+
+		def load_center_templates_dash
+			templates_center_dash = ZeroFileUtils.load_yaml(@center_dir + '/' + TEMPLATE_CENTER_FILE)
+			templates_center_dash[:templates]
 		end
 
 	end
