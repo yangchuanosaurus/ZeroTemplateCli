@@ -1,6 +1,7 @@
 ---
 :template_center: http://center.code-template.org
 :name: name
+:type: android_studio
 :version_string: 1.0.0
 :version:
 - 1

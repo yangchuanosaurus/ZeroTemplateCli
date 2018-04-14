@@ -4,7 +4,7 @@ module ZeroSolution
 
 	class TemplateUse
 
-		attr_reader :uses
+		attr_reader :uses, :dest_folders
 
 		TEMPLATE_FILE = './templates.yml'
 		TEMPLATE_OF_TEMPLATE_FILE = File.dirname(__FILE__) + '/../templates/template_use.yml'
@@ -50,6 +50,7 @@ module ZeroSolution
 			if exists?
 				template_dash = ZeroFileUtils.load_yaml(TEMPLATE_FILE)
 				template_uses( template_dash[:uses] )
+				install_vocabulary( template_dash[:vocabulary] )
 			end
 		end
 
@@ -85,6 +86,12 @@ module ZeroSolution
 					template_version = template_dash[template_name]
 					@uses << Template.new(template_name, template_version)
 				end
+			end
+		end
+
+		def install_vocabulary(vocabulary_dash)
+			if !vocabulary_dash.nil?
+				@dest_folders = vocabulary_dash[:copy]
 			end
 		end
 	end

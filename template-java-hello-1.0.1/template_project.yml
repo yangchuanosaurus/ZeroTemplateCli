@@ -1,6 +1,7 @@
 ---
 :template_center: path_to_template_center
 :name: hello
+:type: android_studio
 :version_string: 1.0.1
 :version:
 - 1
@@ -8,14 +9,12 @@
 - 1
 :vocabulary:
   :copy:
-    :source:
-    - folder1
-    - folder2
-    :resources:
-    - folder1
-    - folder2
+    source:
+    - src/main/java
+    resources:
+    - src/main/resources
   :dependency:
-    :gradle: 3.0.1
+    gradle: 3.0.1
     :dependencies:
     - a
     - b

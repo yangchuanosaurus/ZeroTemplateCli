@@ -4,7 +4,7 @@ module ZeroSolution
 
 	class TemplateProject
 
-		attr_reader :template_name, :template_version
+		attr_reader :template_name, :template_version, :type, :copy_folders
 
 		TEMPLATE_FILE = './template_project.yml'
 		TEMPLATE_OF_TEMPLATE_FILE = File.dirname(__FILE__) + '/../templates/template_project.yml'
@@ -12,6 +12,8 @@ module ZeroSolution
 		def initialize(template_name=nil, template_version=nil)
 			@template_name 		= template_name
 			@template_version = template_version
+			@type							= 'android_studio' # default template type
+			@copy_folders			= Hash.new
 		end
 
 		def init
@@ -26,8 +28,10 @@ module ZeroSolution
 
 			logger.add_msg("template name:    #{@template_name}")
 			logger.add_msg("template version: #{@template_version}")
-
-			ZeroFileUtils.write(TEMPLATE_FILE, load_default_template_project)
+			
+			template_project_dash = load_default_template_project
+			ZeroFileUtils.write(TEMPLATE_FILE, template_project_dash)
+			fill_template_copy(template_project_dash)
 			logger.add_msg("File created:     #{TEMPLATE_FILE}")
 		end
 
@@ -35,12 +39,18 @@ module ZeroSolution
 			template_project_dash = ZeroFileUtils.load_yaml(TEMPLATE_FILE)
 			@template_name 		= template_project_dash[:name]
 			@template_version = template_project_dash[:version_string]
+			@type							= template_project_dash[:type]
+
+			fill_template_copy(template_project_dash)
 		end
 
 		def load_by_dir(dir)
 			template_project_dash = ZeroFileUtils.load_yaml(dir + '/' + TEMPLATE_FILE)
 			@template_name 		= template_project_dash[:name]
 			@template_version = template_project_dash[:version_string]
+			@type							= template_project_dash[:type]
+
+			fill_template_copy(template_project_dash)
 		end
 
 		def publish
@@ -118,6 +128,10 @@ module ZeroSolution
 			template_project_dash[:name] = @template_name
 			template_project_dash[:version_string] = @template_version
 			template_project_dash[:version] = @template_version.split('.').map { |v| v.to_i }
+		end
+
+		def fill_template_copy(template_project_dash)
+			@copy_folders = template_project_dash[:vocabulary][:copy]
 		end
 
 	end
