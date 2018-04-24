@@ -20,7 +20,11 @@ module ZeroSolution
 
 			@template_use.uses.each do |template|
 				template_project = @template_center.find_template(template)
-				install_template(template_project)
+				if !template_project.nil?
+					install_template(template_project)
+				else
+					@logger.add_error("Template `#{template.name} - #{template.version}` not found.")
+				end
 			end
 		end
 
@@ -33,29 +37,30 @@ module ZeroSolution
 			
 			@logger.level += 1
 
-			if !template_project.nil?
-				@logger.add_msg("Migration Copy")
+			@logger.add_msg("Migration Copy")
 
-				dest_dash = @template_use.dest_folders
+			# Copy
+			dest_dash = @template_use.dest_folders
 
-				src_dash = template_project.copy_folders
-				src_dash.each do |section, src_ary|
-					@logger.level += 1
-					n_src_ary = src_ary.collect do |src|
-						full_src = "#{@template_center.center_dir}/#{template_project.template_name}/#{template_project.template_version}/#{src}"
-						@logger.add_msg("#{section} '#{full_src}'' to '#{dest_dash[section]}'")
-						full_src
-					end
-					src_dash[section] = n_src_ary
-					@logger.level -= 1
+			src_dash = template_project.copy_folders
+			src_dash.each do |section, src_ary|
+				@logger.level += 1
+				n_src_ary = src_ary.collect do |src|
+					full_src = "#{@template_center.center_dir}/#{template_project.template_name}/#{template_project.template_version}/#{src}"
+					@logger.add_msg("#{section} '#{full_src}' to '#{dest_dash[section]}'")
+					full_src
 				end
-
-				type = template_project.type
-				migration_copy = instance_of_class( type_class(type) )
-				migration_copy.migrate(src_dash, dest_dash)
-			else
-				@logger.add_msg("Not found in template center.")
+				src_dash[section] = n_src_ary
+				@logger.level -= 1
 			end
+
+			# type = template_project.type
+			# migration_copy = instance_of_class( type_class(type) )
+			migration_copy = MigrationCopy.new
+			migration_copy.migrate(src_dash, dest_dash)
+
+			# Dependency
+			
 			@logger.level -= 1
 
 			@logger.add_msg("Installed.")
